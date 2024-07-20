@@ -1,11 +1,5 @@
 import localFont from "next/font/local";
 
-// export const font = Inter({
-//   subsets: ['latin'],
-//   weight: ['300', '400', '500', '600', '700', '800', '900'],
-//   variable: '--font-inter'
-// })
-
 export const font = localFont({
   src: [
     {
@@ -24,7 +18,7 @@ export const font = localFont({
       style: "normal",
     },
     {
-      path: "./fonts/IRANSansX-SemiBold.woff2",
+      path: "./fonts/IRANSansX-DemiBold.woff2",
       weight: "600",
       style: "normal",
     },
