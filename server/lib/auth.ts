@@ -1,30 +1,45 @@
 import {
+  type DefaultUser,
   type NextAuthOptions,
-  getServerSession
+  getServerSession,
 } from "next-auth"
 import GithubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
 
+declare module "next-auth" {
+  interface Session {
+    user?: DefaultUser & {
+      id: string
+    }
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    uid: string
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     // CredentialsProvider({
-    //   name: "Credentials",
-    //   credentials: {
-    //     username: { label: "Username", type: "text" },
-    //     password: { label: "Password", type: "text" },
-    //   },
-    //   async authorize(credentials, req) {
-    //     // check email exist
-    //     const user = await db.user.findUnique({
-    //       where: {
-    //         username: credentials?.username,
-    //         password: credentials?.password,
-    //       },
-    //     })
-    //     if (user) {
-    //       return user
-    //     }
-    //   },
+    // 	name: "Credentials",
+    // 	credentials: {
+    // 		username: { label: "Username", type: "text" },
+    // 		password: { label: "Password", type: "text" },
+    // 	},
+    // 	async authorize(credentials, req) {
+    // 		// check email exist
+    // 		const user = await db.user.findUnique({
+    // 			where: {
+    // 				username: credentials?.username,
+    // 				password: credentials?.password,
+    // 			},
+    // 		})
+    // 		if (user) {
+    // 			return user
+    // 		}
+    // 	},
     // }),
     GithubProvider({
       clientId: process.env.GITHUB_ID!,
@@ -52,13 +67,21 @@ export const authOptions: NextAuthOptions = {
     //   })
     //   return true
     // },
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: async ({ session, token }) => {
+      if (session?.user) {
+        session.user.id = token.uid
+      }
+      return session
+    },
+    jwt: async ({ token, user, trigger, session }) => {
+      if (user) {
+        token.uid = user.id
+      }
+      if (trigger === "update") {
+        return { ...token, ...session.user }
+      }
+      return { ...token, ...user }
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
   session: {
