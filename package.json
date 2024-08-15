@@ -2,11 +2,10 @@
   "name": "pocket",
   "version": "1.9.8",
   "scripts": {
-    "dev": "next dev --turbo",
-    "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "production": "prisma generate && next build",
+    "dev": "next dev --turbo",
+    "lint": "biome format --write .",
+    "build": "prisma generate && next build",
     "db:push": "prisma db push",
     "db:gen": "prisma generate",
     "db:std": "prisma studio"
